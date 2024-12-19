@@ -1,32 +1,34 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
+
 package onlinebanking2;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-/**
- *
- * @author Sohail
- */
 public class Login extends javax.swing.JFrame {
 
-    /**
-     * Creates new form Login
-     */
-    JDBC db;
-    String password;
-    int id;
-    public Login() {
+    
+    private static Login instance; 
+
+    private JDBC db;
+    private String password;
+    private int id;
+
+   
+    private Login() {
         initComponents();
-        this.setBounds(0,0,600,380);
+        this.setBounds(0, 0, 600, 380);
         this.setLocationRelativeTo(null);
         this.setResizable(false);
-        db=new JDBC();
+        db = new JDBC();
     }
 
+    
+    public static Login getInstance() {
+        if (instance == null) {
+            instance = new Login();
+        }
+        return instance;
+    }
    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -91,59 +93,42 @@ public class Login extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        String s1,s2;
-        s1=jPasswordField1.getText();
-        JFrame f=new JFrame();
-        
-        
-        if(s1.equals(""))
-        {
-        JOptionPane.showMessageDialog(f,"Empty Field");
-        }
-        else
-        {
-        s2="select * from tb_signup where fdPinCode='"+s1+"'";
-        try
-        {
-          db.rs=db.stm.executeQuery(s2);
-          db.rs.next();
-          id = db.rs.getInt(1);
-          password = db.rs.getString(5); 
-          
-        }
-        catch(Exception ec)
-        {
-            System.out.println(ec);
-        }
-        
-        if(!s1.equals(password))
-        {
-            JOptionPane.showMessageDialog(f,"Wrong PIN");
-        }
-        else
-        {
-            
-            JOptionPane.showMessageDialog(f,"Login Successfull");
-         
-            String id1=String.valueOf(id);
-            
-            
-            Home home=new Home(id1);
-            home.setVisible(true);
-        }
+        String s1 = jPasswordField1.getText();
+        JFrame f = new JFrame();
+
+        if (s1.equals("")) {
+            JOptionPane.showMessageDialog(f, "Empty Field");
+        } else {
+            String s2 = "select * from tb_signup where fdPinCode='" + s1 + "'";
+            try {
+                db.rs = db.stm.executeQuery(s2);
+                db.rs.next();
+                id = db.rs.getInt(1);
+                password = db.rs.getString(5);
+
+            } catch (Exception ec) {
+                System.out.println(ec);
+            }
+
+            if (!s1.equals(password)) {
+                JOptionPane.showMessageDialog(f, "Wrong PIN");
+            } else {
+                JOptionPane.showMessageDialog(f, "Login Successful");
+                String id1 = String.valueOf(id);
+
+                Home home = new Home(id1);
+                home.setVisible(true);
+            }
         }
         
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jLabel3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel3MouseClicked
         // TODO add your handling code here:
-        CreateAccount ca=new CreateAccount();
+         CreateAccount ca = new CreateAccount();
         ca.setVisible(true);
     }//GEN-LAST:event_jLabel3MouseClicked
 
-    /**
-     * @param args the command line arguments
-     */
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">

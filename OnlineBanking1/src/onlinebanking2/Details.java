@@ -89,7 +89,7 @@ public class Details extends javax.swing.JFrame {
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel1.setText("Welcome");
         getContentPane().add(jLabel1);
-        jLabel1.setBounds(250, 20, 80, 20);
+        jLabel1.setBounds(210, 20, 80, 20);
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel2.setText("Customer ID");
@@ -120,7 +120,7 @@ public class Details extends javax.swing.JFrame {
         getContentPane().add(jLabel10);
         jLabel10.setBounds(360, 160, 70, 16);
         getContentPane().add(jLabel11);
-        jLabel11.setBounds(440, 150, 157, 22);
+        jLabel11.setBounds(440, 160, 157, 22);
 
         jLabel12.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel12.setText("Date Of Birth");
@@ -132,7 +132,7 @@ public class Details extends javax.swing.JFrame {
         jLabel14.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jLabel14.setForeground(new java.awt.Color(204, 204, 255));
         getContentPane().add(jLabel14);
-        jLabel14.setBounds(350, 20, 183, 25);
+        jLabel14.setBounds(300, 20, 183, 25);
 
         jButton1.setText("Update");
         jButton1.addActionListener(new java.awt.event.ActionListener() {

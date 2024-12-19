@@ -8,60 +8,93 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import java.util.ArrayList;
+import java.util.List;
 
 
-public class Transfer extends javax.swing.JFrame {
+interface Subject {
+    void addObserver(Observer observer);
+    void removeObserver(Observer observer);
+    void notifyObservers();
+}
 
+// Observer Interface
+interface Observer {
+    void update(String message);
+}
+
+public class Transfer extends javax.swing.JFrame implements Subject {
+
+    // List of observers
+    private List<Observer> observers = new ArrayList<>();
+    
+    // Database object
     JDBC db;
+    
+    // Sender ID and Reciever ID
     String SenderId;
     String Reciever;
-    JFrame f=new JFrame();
+    
+    // JFrame for dialogs
+    JFrame f = new JFrame();
+
     public Transfer(String id) {
         initComponents();
-        this.setBounds(0,0,514,400);
+        this.setBounds(0, 0, 514, 400);
         this.setLocationRelativeTo(null);
         this.setResizable(false);
-        db=new JDBC();
+        db = new JDBC();
         
-        SenderId=id;
-        String s2,s3;
+        SenderId = id;
        
         
-        s2="select * from tb_signup ";
-        try
-        {
-          db.rs=db.stm.executeQuery(s2);
-          while(db.rs.next())
-          {
-              String name=db.rs.getString("fd_AccountId");
-              jComboBox1.addItem(name);
-              String amount=db.rs.getString("fd_Amount");
-              jLabel5.setText(amount);
-          }
-        }
+         TransactionLogger transactionLogger = new TransactionLogger();
+        UIUpdater uiUpdater = new UIUpdater();
         
-        catch(Exception ec)
-        {
+        addObserver(transactionLogger);
+        addObserver(uiUpdater);
+        
+        // Initialize combo box with account IDs
+        String s2 = "select * from tb_signup";
+        try {
+            db.rs = db.stm.executeQuery(s2);
+            while (db.rs.next()) {
+                String name = db.rs.getString("fd_AccountId");
+                jComboBox1.addItem(name);
+                String amount = db.rs.getString("fd_Amount");
+                jLabel5.setText(amount);
+            }
+        } catch (Exception ec) {
             System.out.println(ec);
         }
         
-        s2="select * from tb_signup where fdSNo='"+SenderId+"'";
-        try
-        {
-          db.rs=db.stm.executeQuery(s2);
-          while(db.rs.next())
-          {
-              
-              String amount=db.rs.getString("fd_Amount");
-              jLabel5.setText(amount);
-          }
-        }
-        
-        catch(Exception ec)
-        {
+        s2 = "select * from tb_signup where fdSNo='" + SenderId + "'";
+        try {
+            db.rs = db.stm.executeQuery(s2);
+            while (db.rs.next()) {
+                String amount = db.rs.getString("fd_Amount");
+                jLabel5.setText(amount);
+            }
+        } catch (Exception ec) {
             System.out.println(ec);
         }
-          
+    }
+    
+    @Override
+    public void addObserver(Observer observer) {
+        observers.add(observer);
+    }
+
+    @Override
+    public void removeObserver(Observer observer) {
+        observers.remove(observer);
+    }
+
+    @Override
+    public void notifyObservers() {
+        for (Observer observer : observers) {
+            observer.update("Transfer completed for account: " + SenderId);
+        }
     }
 
     /**
@@ -165,95 +198,61 @@ public class Transfer extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
 
-String amount, s8, s2, s20 = null;
-int id;
-amount = jTextField1.getText();
+String amount = jTextField1.getText();
+        
+        // Get current date and time
+        Date date = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yy hh:mm:ss");
+        String str = formatter.format(date);
 
-//Current date and time start//
-Date date = new Date();
-SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yy hh:mm:ss");
-String str = formatter.format(date);
-//Current date and time End//
+        if (amount.equals("")) {
+            JOptionPane.showMessageDialog(f, "Empty Field");
+        } else {
+            String s11 = "Select * from tb_signup where fdSNo='" + SenderId + "'";
 
-
-
-if (amount.equals("")) {
-    JOptionPane.showMessageDialog(f, "Empty Field");
-} else {
-
-
-    String s11 = "Select * from tb_signup where fdSNo='" + SenderId + "'";
-
-    try {
-        db.rs = db.stm.executeQuery(s11);
-
-        db.rs.next();
-
-        s20 = db.rs.getString(12);
-
-    } catch (Exception ec) {
-        System.out.println(ec);
-    }
-
-    int amount11, s14;
-    amount11 = Integer.parseInt(amount);
-    s14 = Integer.parseInt(s20);
-    if (s14 <= amount11) 
-    {
-        JOptionPane.showMessageDialog(f, "InSufficient Amount");
-    } else {
-
-        s8 = "INSERT INTO tb_transactions(fd_SenderId,fd_RecieverId,fd_Amount,fd_DateTime)VALUES('" + SenderId + "','" + Reciever + "','" + amount + "','" + str + "')";
-        try {
-            db.stm.executeUpdate(s8);
-
-        } catch (Exception ec) {
-            System.out.println(ec);
-        }
-
-        s2 = "select * from tb_signup where fd_AccountId='" + Reciever + "'";
-        try {
-            db.rs = db.stm.executeQuery(s2);
-            db.rs.next();
-            int Reciver_amount = db.rs.getInt(12);
-            int amount1 = Integer.parseInt(amount);
-            int Total_Amount = Reciver_amount + amount1;
-
-            String s10 = "Update  tb_signup set fd_Amount='" + Total_Amount + "' where fd_AccountId='" + Reciever + "'";
-            System.out.println(s10);
             try {
-                db.stm.executeUpdate(s10);
+                db.rs = db.stm.executeQuery(s11);
+                db.rs.next();
+                String s20 = db.rs.getString(12);
+                
+                int amount11 = Integer.parseInt(amount);
+                int s14 = Integer.parseInt(s20);
+                
+                if (s14 < amount11) {
+                    JOptionPane.showMessageDialog(f, "Insufficient Amount");
+                } else {
+                    String s8 = "INSERT INTO tb_transactions(fd_SenderId, fd_RecieverId, fd_Amount, fd_DateTime) " +
+                                 "VALUES('" + SenderId + "','" + Reciever + "','" + amount + "','" + str + "')";
+                    db.stm.executeUpdate(s8);
+
+                    // Update receiver's balance
+                    String s2 = "select * from tb_signup where fd_AccountId='" + Reciever + "'";
+                    db.rs = db.stm.executeQuery(s2);
+                    db.rs.next();
+                    int recieverAmount = db.rs.getInt(12);
+                    int totalAmount = recieverAmount + Integer.parseInt(amount);
+                    String s10 = "Update tb_signup set fd_Amount='" + totalAmount + "' where fd_AccountId='" + Reciever + "'";
+                    db.stm.executeUpdate(s10);
+
+                    // Update sender's balance
+                    s2 = "select * from tb_signup where fdSNo='" + SenderId + "'";
+                    db.rs = db.stm.executeQuery(s2);
+                    db.rs.next();
+                    int senderAmount = db.rs.getInt(12);
+                    int updatedAmount = senderAmount - Integer.parseInt(amount);
+                    String s12 = "Update tb_signup set fd_Amount='" + updatedAmount + "' where fdSNo='" + SenderId + "'";
+                    db.stm.executeUpdate(s12);
+
+                    // Notify observers after successful transaction
+                    notifyObservers();
+                }
             } catch (Exception ec) {
                 System.out.println(ec);
             }
-        } catch (Exception ec) {
-
-            System.out.println(ec);
         }
+        
+        this.dispose();
 
-        s2 = "select * from tb_signup where fdSNo='" + SenderId + "'";
-        try {
-            db.rs = db.stm.executeQuery(s2);
-            db.rs.next();
-            int Reciver_amount = db.rs.getInt(12);
-            int amount1 = Integer.parseInt(amount);
-            int Total_Amount = Reciver_amount - amount1;
-
-            String s12 = "Update tb_signup set fd_Amount='" + Total_Amount + "' where fdSNo='" + SenderId + "'";
-            System.out.println(s12);
-            try {
-                db.stm.executeUpdate(s12);
-            } catch (Exception ec) {
-                System.out.println(ec);
-            }
-        } catch (Exception ec) {
-            System.out.println(ec);
-        }
-
-    }
-    
-    this.dispose();
-}
 
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -266,35 +265,25 @@ if (amount.equals("")) {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Transfer.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Transfer.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Transfer.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Transfer.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                
-            }
+        java.awt.EventQueue.invokeLater(() -> {
+            new Transfer("SomeSenderId").setVisible(true);
         });
+    }
+    
+    class TransactionLogger implements Observer {
+        @Override
+        public void update(String message) {
+            System.out.println("TransactionLogger: " + message);
+            // Here you can log the transaction to a file or database
+        }
+    }
+
+    class UIUpdater implements Observer {
+        @Override
+        public void update(String message) {
+            System.out.println("UIUpdater: " + message);
+            // Update the UI with the success message
+        }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
