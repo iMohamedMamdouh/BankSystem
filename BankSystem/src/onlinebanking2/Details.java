@@ -184,26 +184,27 @@ public class Details extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-       String phoneNumber = jTextField1.getText();
-        String pin = jLabel7.getText();
-        String name = jTextField3.getText();
-        String address = jTextField4.getText();
+        String phoneNumber = jTextField1.getText();
+    String pin = jLabel7.getText();
+    String name = jTextField3.getText();
+    String address = jTextField4.getText();
 
-        // Check if any field is empty
-        if (phoneNumber.isEmpty() || pin.isEmpty() || name.isEmpty() || address.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please fill in all the fields.");
-        } else {
-            // Construct SQL query to update user details
-            String updateQuery = "UPDATE tb_signup SET fd_PhoneNumber='" + phoneNumber + "', fdPinCode='" + pin + 
-                                 "', fdName='" + name + "', fd_Address='" + address + "' WHERE fdSNo='" + id + "'";
-            try {
-                db.stm.executeUpdate(updateQuery);
-                JOptionPane.showMessageDialog(this, "Details updated successfully!");
-            } catch (Exception e) {
-                e.printStackTrace();
-                JOptionPane.showMessageDialog(this, "Error updating details: " + e.getMessage());
-            }
+    // Check if any field is empty
+    if (phoneNumber.isEmpty() || pin.isEmpty() || name.isEmpty() || address.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Please fill in all the fields.");
+    } else {
+        // Construct SQL query to update user details
+        String updateQuery = "UPDATE tb_signup SET fd_PhoneNumber='" + phoneNumber + "', fdPinCode='" + pin + 
+                             "', fdName='" + name + "', fd_Address='" + address + "' WHERE fdSNo='" + id + "'";
+        try {
+            db.stm.executeUpdate(updateQuery);
+            // Show success message after update
+            JOptionPane.showMessageDialog(this, "Details updated successfully!");
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error updating details: " + e.getMessage());
         }
+    }
     
     }//GEN-LAST:event_jButton1ActionPerformed
 

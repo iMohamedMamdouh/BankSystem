@@ -1,9 +1,0 @@
-onlinebanking2.Observer
-onlinebanking2.Transfer$UIUpdater
-onlinebanking2.Transfer$1
-onlinebanking2.Transfer
-onlinebanking2.Transfer$TransactionLogger
-onlinebanking2.Subject
-onlinebanking2.Transfer$2
-onlinebanking2.Transfer$3
-onlinebanking2.Transfer$4

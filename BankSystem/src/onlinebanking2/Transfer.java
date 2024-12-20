@@ -199,28 +199,34 @@ public class Transfer extends javax.swing.JFrame implements Subject {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
 
 String amount = jTextField1.getText();
-        
-        // Get current date and time
-        Date date = new Date();
-        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yy hh:mm:ss");
-        String str = formatter.format(date);
+    
+    // Get current date and time
+    Date date = new Date();
+    SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yy hh:mm:ss");
+    String str = formatter.format(date);
 
-        if (amount.equals("")) {
-            JOptionPane.showMessageDialog(f, "Empty Field");
-        } else {
-            String s11 = "Select * from tb_signup where fdSNo='" + SenderId + "'";
+    if (amount.equals("")) {
+        JOptionPane.showMessageDialog(f, "Empty Field");
+    } else {
+        String s11 = "Select * from tb_signup where fdSNo='" + SenderId + "'";
 
-            try {
-                db.rs = db.stm.executeQuery(s11);
-                db.rs.next();
-                String s20 = db.rs.getString(12);
+        try {
+            db.rs = db.stm.executeQuery(s11);
+            db.rs.next();
+            String s20 = db.rs.getString(12);
+            
+            int amount11 = Integer.parseInt(amount);
+            int s14 = Integer.parseInt(s20);
+            
+            if (s14 < amount11) {
+                JOptionPane.showMessageDialog(f, "Insufficient Amount");
+            } else {
+                // Show confirmation dialog before proceeding with transfer
+                int confirm = JOptionPane.showConfirmDialog(f, 
+                    "Are you sure you want to transfer " + amount + " to account " + Reciever + "?",
+                    "Confirm Transfer", JOptionPane.YES_NO_OPTION);
                 
-                int amount11 = Integer.parseInt(amount);
-                int s14 = Integer.parseInt(s20);
-                
-                if (s14 < amount11) {
-                    JOptionPane.showMessageDialog(f, "Insufficient Amount");
-                } else {
+                if (confirm == JOptionPane.YES_OPTION) {
                     String s8 = "INSERT INTO tb_transactions(fd_SenderId, fd_RecieverId, fd_Amount, fd_DateTime) " +
                                  "VALUES('" + SenderId + "','" + Reciever + "','" + amount + "','" + str + "')";
                     db.stm.executeUpdate(s8);
@@ -245,13 +251,19 @@ String amount = jTextField1.getText();
 
                     // Notify observers after successful transaction
                     notifyObservers();
+
+                    JOptionPane.showMessageDialog(f, "Transfer Successful");
+                } else {
+                    // Transaction canceled
+                    JOptionPane.showMessageDialog(f, "Transaction Canceled");
                 }
-            } catch (Exception ec) {
-                System.out.println(ec);
             }
+        } catch (Exception ec) {
+            System.out.println(ec);
         }
-        
-        this.dispose();
+    }
+    
+    this.dispose();
 
 
     }//GEN-LAST:event_jButton1ActionPerformed
