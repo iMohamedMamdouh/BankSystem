@@ -1,58 +1,68 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
+ */
 package onlinebanking2;
 
-import java.text.DecimalFormat;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class Details extends javax.swing.JFrame {
+    private String id;
+    private JDBC db;
+    private String name, phoneNumber, pin, accountId, address, gender, nationality, dob;
 
-    
-    String id;
-    JDBC db;
-    String s2,name,Phone_Number,Pin,AccountId,Address,Gender,Nationality,dob;
     public Details(String id) {
         initComponents();
-        this.setBounds(0,0,630,400);
+        this.setBounds(0, 0, 630, 400);
         this.setLocationRelativeTo(null);
         this.setResizable(false);
-        this.id=id;
-        db=new JDBC();
-        
-        DecimalFormat df=new DecimalFormat("#,###.00");
-        
-        s2="select * from tb_signup where fdSNo='"+this.id+"'";
-        try
-        {
-          db.rs=db.stm.executeQuery(s2);
-          db.rs.next();
-          name = db.rs.getString(2);
-          Phone_Number = db.rs.getString(3);
-          Pin = db.rs.getString(5);
-          AccountId= db.rs.getString(11);
-          Address= db.rs.getString(7);
-          Gender= db.rs.getString(8);
-          Nationality= db.rs.getString(9);
-          dob= db.rs.getString(10);
-          
-          
-          
-          jLabel14.setText(name);
-          jTextField1.setText(Phone_Number);
-          jLabel7.setText(Pin);
-          jLabel3.setText(AccountId);
-          jTextField3.setText(name);
-          jTextField4.setText(Address);
-          jLabel9.setText(Gender);
-          jLabel11.setText(Nationality);
-          jLabel13.setText(dob);
-        }
-        catch(Exception ec)
-        {
-            System.out.println(ec);
-        }
+        this.id = id;
+        db = new JDBC();
+
+        fetchData();
+
+        // Set up buttons with commands
+        jButton1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        jButton2.addActionListener(evt -> new CancelCommand(Details.this).execute());
     }
 
+    private void fetchData() {
+        String query = "select * from tb_signup where fdSNo='" + this.id + "'";
+        try {
+            db.rs = db.stm.executeQuery(query);
+            if (db.rs.next()) {
+                name = db.rs.getString(2);
+                phoneNumber = db.rs.getString(3);
+                pin = db.rs.getString(5);
+                accountId = db.rs.getString(11);
+                address = db.rs.getString(7);
+                gender = db.rs.getString(8);
+                nationality = db.rs.getString(9);
+                dob = db.rs.getString(10);
+
+                // Set the data in the GUI components
+                jLabel14.setText(name);
+                jTextField1.setText(phoneNumber);
+                jLabel7.setText(pin);
+                jLabel3.setText(accountId);
+                jTextField3.setText(name);
+                jTextField4.setText(address);
+                jLabel9.setText(gender);
+                jLabel11.setText(nationality);
+                jLabel13.setText(dob);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error fetching data: " + e.getMessage());
+        }
+    }
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -174,32 +184,27 @@ public class Details extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        JFrame f=new JFrame();
-        String s1,s2,s3,s4,s10;
-        
-        s1=jTextField1.getText();
-        s2=jLabel7.getText();
-        s3=jTextField3.getText();
-        s4=jTextField4.getText();
-        
-        
-        if(s1.equals("")||s2.equals("")||s3.equals("")||s4.equals(""))
-        {
-            JOptionPane.showMessageDialog(f, "Empty Field");
-        }else{
-        s10="Update  tb_signup set fd_PhoneNumber='"+s1+"',fdPinCode='"+s2+"',fdName='"+s3+"',fd_Address='"+s4+"' WHERE fdSNo='"+id+"'";
-        System.out.println(s10);
-        try
-        {
-            db.stm.executeUpdate(s10);
+       String phoneNumber = jTextField1.getText();
+        String pin = jLabel7.getText();
+        String name = jTextField3.getText();
+        String address = jTextField4.getText();
 
-        }catch(Exception ec)
-        {
-            System.out.println(ec);
+        // Check if any field is empty
+        if (phoneNumber.isEmpty() || pin.isEmpty() || name.isEmpty() || address.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please fill in all the fields.");
+        } else {
+            // Construct SQL query to update user details
+            String updateQuery = "UPDATE tb_signup SET fd_PhoneNumber='" + phoneNumber + "', fdPinCode='" + pin + 
+                                 "', fdName='" + name + "', fd_Address='" + address + "' WHERE fdSNo='" + id + "'";
+            try {
+                db.stm.executeUpdate(updateQuery);
+                JOptionPane.showMessageDialog(this, "Details updated successfully!");
+            } catch (Exception e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Error updating details: " + e.getMessage());
+            }
         }
-      
-        this.dispose();
-        }
+    
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
@@ -212,10 +217,19 @@ public class Details extends javax.swing.JFrame {
        
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                
+                new Details("12345").setVisible(true); // Example user ID
             }
         });
     }
+    
+    public String getId() {
+        return id;
+    }
+
+    public JDBC getDb() {
+        return db;
+    }
+    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
@@ -240,4 +254,6 @@ public class Details extends javax.swing.JFrame {
     private javax.swing.JTextField jTextField3;
     private javax.swing.JTextField jTextField4;
     // End of variables declaration//GEN-END:variables
+
+    
 }
